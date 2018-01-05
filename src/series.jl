@@ -2,9 +2,9 @@
 ### Series as dictionary between monomials and values, representing
 ### linear functionals on polynomials.
 ###
-### B. Mourrain
+### Bernard Mourrain
 ###
-### 4/01/18
+
 
 export series, zero, convert, monomials, setindex, setindex!, dual, deg, integrate
        +, -, *, /
@@ -13,16 +13,14 @@ import Base:
     show, showcompact, print, length, endof, getindex, setindex!, copy, promote_rule, convert, start, next, done, eltype, dot,
     *, /, //, -, +, ==, ^, divrem, conj, rem, real, imag, diff, norm
 
-#import DynamicPolynomials: maxdegree, isconstant, show, monomials
-
-import MultivariatePolynomials: AbstractMonomial
+import MultivariatePolynomials: AbstractMonomial, AbstractTerm, AbstractPolynomial
 
 #----------------------------------------------------------------------
 """
 ```
 Series{C,M}
 ```
-Class representing multivariate series. The series are dictionaries, 
+Class representing multivariate series. The series is a dictionary, 
 which associates values of type C to monomials of type M. 
 """
 mutable struct Series{C,M}
@@ -252,12 +250,19 @@ end
 function *(u::U, s::Series{C,M}) where {U <: Number, C,M}
     r = zero(Series{promote_type(C,U),M})
     for (m, c) in s
+        r[m] = u * c
+    end
+    r
+end
+
+function *(s::Series{C,M}, u::U) where {U <: Number, C,M}
+    r = zero(Series{promote_type(C,U),M})
+    for (m, c) in s
         r[m] = c * u
     end
     r
 end
 
-*(s::Series, u) = s * p
 
 function /(p::Series{C,M}, s::U) where {C,M, U <: Number}
     r = zero(Series{promote_type(C,U),M})
@@ -284,8 +289,8 @@ function Base.inv(v:: V) where V <: AbstractVariable
 end
 
 #----------------------------------------------------------------------
-function isprimal(m::Monomial{true})
-    return !any(t->t<0, m.z)
+function isprimal(m::M) where M <: AbstractMonomial
+    return !any(t->t<0, exponents(m))
 end
 
 #----------------------------------------------------------------------
@@ -293,6 +298,7 @@ end
 ```
  *(v::Variable,   s::Series{C,M}) -> Series{C,M}
  *(m::Monomial,   s::Series{C,M}) -> Series{C,M}
+ *(t::Term,       s::Series{C,M}) -> Series{C,M}
  *(p::Polynomial, s::Series{C,M}) -> Series{C,M}
 ```
 The dual product where variables are inverted in the polynomial and the monomials with positive exponents are kept in the series.
@@ -319,11 +325,16 @@ function *(m0::M, s::Series{C,M}) where {C,M <: AbstractMonomial}
     return r
 end
 
+function *(t::T, s::Series{C,M}) where {C,M <: AbstractMonomial,
+                                        T<:AbstractTerm}
+    return coefficient(t)*(monomial(t)*s)
+end
+
 function *(p::P, s::Series{C,M}) where {C, M <:AbstractMonomial,
                                         P<:AbstractPolynomial}
     r = Series{C,M}()
     for t in terms(p)
-        r =r + coefficient(t)*(monomial(t)*s)
+        r = r + t*s
     end
     return r
 end
@@ -338,15 +349,15 @@ function integrate(s::Series{C,M}, v::V) where {C,M, V<: AbstractVariable}
     return r
 end
 
-function ^(p::Series, power::Integer)
+function ^(s::Series, power::Integer)
     @assert power >= 0
     if power == 0
-        return one(p)
+        return one(s)
     elseif power == 1
-        return p
+        return s
     else
         f, r = divrem(power, 2)
-        return p^(f+r) * p^f
+        return s^(f+r) * s^f
     end
 end
 
@@ -390,7 +401,7 @@ function Base.dot(sigma::Series{C,M}, m::M) where {C,M}
     return sigma[m]
 end
 
-function Base.dot(sigma::Series{C,M}, t::Term) where {C,M}
+function Base.dot(sigma::Series{C,M}, t::T) where {C,M, T<:AbstractTerm}
     return coefficient(t)*sigma[monomial(t)]
 end
 

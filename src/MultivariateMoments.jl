@@ -20,5 +20,6 @@ include("exp.jl")
 include("matmeasure.jl")
 include("atomic.jl")
 include("extract.jl")
+include("series.jl")
 
 end # module
