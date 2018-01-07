@@ -21,5 +21,8 @@ include("matmeasure.jl")
 include("atomic.jl")
 include("extract.jl")
 include("series.jl")
+include("generators.jl")
+include("hankel.jl")
+include("decompose.jl")
 
 end # module
