@@ -1,3 +1,11 @@
+###
+### Series as linear functionals on polynomials. 
+###
+### Hankel matrices associated to series.
+###
+### Bernard Mourrain
+###
+
 export series, hankel, hankelspan
 
 #-----------------------------------------------------------------------

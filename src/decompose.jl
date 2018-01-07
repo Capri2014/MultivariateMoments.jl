@@ -1,3 +1,13 @@
+###
+### Series as linear functionals on polynomials. 
+###
+### Decomposition of series from their first moments.
+### Compute the corresponding weighted sum of Dirac measures.
+###
+### Bernard Mourrain
+###
+
+
 export decompose
 
 #------------------------------------------------------------------------
