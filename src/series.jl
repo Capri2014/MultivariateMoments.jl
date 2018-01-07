@@ -12,8 +12,6 @@ import Base:
     show, showcompact, print, length, endof, getindex, setindex!, copy, promote_rule, convert, start, next, done, eltype, dot,
     *, /, //, -, +, ==, ^, divrem, conj, rem, real, imag, diff, norm
 
-#import MultivariatePolynomials: AbstractMonomial, AbstractTerm, AbstractPolynomial
-
 #----------------------------------------------------------------------
 """
 ```
@@ -43,7 +41,7 @@ function series(c::C, m::M) where {C <: Number, M <: AbstractMonomial}
 end
 
 MultivariatePolynomials.terms(p::Series) = p.terms
-monomials(p::Series) = keys(p.terms)
+MultivariatePolynomials.monomials(p::Series) = keys(p.terms)
 
 Base.eltype(::Series{C,M}) where {M, C} = C
 

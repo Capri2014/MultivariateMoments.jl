@@ -9,8 +9,6 @@
 
 export series, dual, moment, monoms
 
-#import MultivariatePolynomials: AbstractVariable, AbstractMonomial, AbstractPolynomial
-
 #-----------------------------------------------------------------------
 """
 ```
@@ -21,9 +19,9 @@ List of all monomials in the variables V up to degree d of from degree d1 to d2,
 ordered by increasing degree.
 """
 function monoms(V::Vector{Var}, rg::UnitRange{Int64}) where Var<:AbstractVariable
-    l = [MultivariatePolynomials.monomials(V,0)[1]]
+    l = [monomials(V,0)[1]]
     for i in 1:rg[end]
-        append!(l,MultivariatePolynomials.monomials(V,i))
+        append!(l,monomials(V,i))
     end
     l
 end
